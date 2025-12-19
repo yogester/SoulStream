@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Star, Video, Phone, MessageCircle, Heart, MapPin, Languages, ChevronRight } from 'lucide-react';
+import { Star, Video, Phone, MessageCircle, Heart, MapPin, Languages, ChevronRight, Zap } from 'lucide-react';
 import { Healer } from '../types';
 
 interface HealerCardProps {
@@ -15,25 +15,52 @@ const HealerCard: React.FC<HealerCardProps> = ({ healer, isFavorite, onToggleFav
   return (
     <div 
       onClick={() => onViewProfile(healer)}
-      className="bg-white dark:bg-slate-900 rounded-3xl p-4 shadow-sm border border-slate-100 dark:border-slate-800 mb-4 hover:shadow-md transition-all relative cursor-pointer group"
+      className={`bg-white dark:bg-slate-900 rounded-3xl p-4 shadow-sm border mb-4 hover:shadow-md transition-all relative cursor-pointer group overflow-hidden ${
+        healer.isOnline 
+          ? 'border-green-100 dark:border-green-900/30' 
+          : 'border-slate-100 dark:border-slate-800'
+      }`}
     >
+      {/* Online Status Background Glow */}
+      {healer.isOnline && (
+        <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/5 blur-[40px] pointer-events-none"></div>
+      )}
+
       <div className="flex gap-4">
         <div className="relative">
           <img 
             src={healer.avatar} 
             alt={healer.name} 
-            className="w-20 h-20 rounded-2xl object-cover ring-2 ring-slate-50 dark:ring-slate-800"
+            className={`w-20 h-20 rounded-2xl object-cover ring-2 transition-all ${
+              healer.isOnline 
+                ? 'ring-green-500 shadow-lg shadow-green-500/20' 
+                : 'ring-slate-50 dark:ring-slate-800'
+            }`}
           />
-          {healer.isOnline && (
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
+          {healer.isOnline ? (
+            <div className="absolute -top-1.5 -right-1.5 flex items-center gap-1 bg-green-500 text-white text-[8px] font-black uppercase tracking-tighter px-1.5 py-0.5 rounded-full shadow-lg border-2 border-white dark:border-slate-900 animate-bounce">
+              <Zap size={8} fill="currentColor" />
+              Live
+            </div>
+          ) : (
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-slate-200 dark:bg-slate-700 border-2 border-white dark:border-slate-900 rounded-full"></div>
           )}
         </div>
+        
         <div className="flex-1">
           <div className="flex justify-between items-start">
             <div className="flex-1">
-              <h3 className="font-bold text-slate-800 dark:text-slate-100 leading-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                {healer.name}
-              </h3>
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold text-slate-800 dark:text-slate-100 leading-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                  {healer.name}
+                </h3>
+                {healer.isOnline && (
+                  <span className="flex items-center gap-1 text-[9px] font-bold text-green-500 uppercase tracking-widest">
+                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                    Online
+                  </span>
+                )}
+              </div>
               <div className="flex items-center gap-1 mt-0.5">
                 <MapPin size={10} className="text-slate-400 dark:text-slate-600" />
                 <span className="text-[10px] text-slate-500 dark:text-slate-500 font-medium">{healer.location}</span>
@@ -95,10 +122,14 @@ const HealerCard: React.FC<HealerCardProps> = ({ healer, isFavorite, onToggleFav
               e.stopPropagation();
               onCall(healer, 'VIDEO');
             }}
-            className="px-4 py-2.5 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 dark:shadow-none font-bold text-xs flex items-center gap-2"
+            className={`px-4 py-2.5 rounded-xl transition-all font-bold text-xs flex items-center gap-2 ${
+              healer.isOnline 
+                ? 'bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-500/20' 
+                : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200 dark:shadow-none'
+            }`}
           >
             <Video size={16} />
-            <span>Connect</span>
+            <span>{healer.isOnline ? 'Connect Now' : 'Connect'}</span>
           </button>
         </div>
       </div>

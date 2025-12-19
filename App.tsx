@@ -10,7 +10,7 @@ import { MOCK_HEALERS, CATEGORIES, GLOBAL_STATS } from './constants';
 import { 
   Search, Bell, Filter, ChevronRight, Wallet, User as UserIcon, LogOut, 
   CheckCircle, CreditCard, MessageSquare, Star, Heart, Activity, Globe, 
-  ArrowUpRight, ArrowDownLeft, Clock
+  ArrowUpRight, ArrowDownLeft, Clock, Zap
 } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -26,19 +26,22 @@ const App: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   
-  // Theme state
+  // Theme state with improved initialization
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const stored = localStorage.getItem('soulstream_theme');
     if (stored) return stored === 'dark';
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
+  // Sync theme to document element
   useEffect(() => {
-    localStorage.setItem('soulstream_theme', isDarkMode ? 'dark' : 'light');
+    const root = window.document.documentElement;
     if (isDarkMode) {
-      document.documentElement.classList.add('dark');
+      root.classList.add('dark');
+      localStorage.setItem('soulstream_theme', 'dark');
     } else {
-      document.documentElement.classList.remove('dark');
+      root.classList.remove('dark');
+      localStorage.setItem('soulstream_theme', 'light');
     }
   }, [isDarkMode]);
 
@@ -93,6 +96,7 @@ const App: React.FC = () => {
   });
 
   const favoriteHealers = healersWithUpdatedRatings.filter(h => favorites.includes(h.id));
+  const onlineCount = filteredHealers.filter(h => h.isOnline).length;
 
   const handleStartCall = (healer: Healer, type: string) => {
     setActiveHealer(healer);
@@ -223,8 +227,14 @@ const App: React.FC = () => {
       </div>
 
       <div className="mt-4">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-4 px-1">
           <h3 className="font-bold text-slate-800 dark:text-slate-200">Global Directory</h3>
+          {onlineCount > 0 && (
+            <div className="flex items-center gap-1.5 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-lg border border-green-100 dark:border-green-800">
+              <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+              <span className="text-[10px] font-bold text-green-600 dark:text-green-400 uppercase tracking-widest">{onlineCount} Online Now</span>
+            </div>
+          )}
         </div>
         {filteredHealers.length > 0 ? (
           filteredHealers.map(healer => (
