@@ -1,0 +1,8 @@
+{
+  "name": "SoulStream: Global Healing Marketplace",
+  "description": "A premium platform connecting certified healers with seekers worldwide via video, voice, and text. Features real-time session billing and a global directory.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

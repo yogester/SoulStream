@@ -1,0 +1,30 @@
+
+import { GoogleGenAI } from "@google/genai";
+
+export class GeminiService {
+  private ai: GoogleGenAI;
+
+  constructor() {
+    this.ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+  }
+
+  async generateHealerResponse(healerName: string, specialty: string, userMessage: string, history: { role: string, content: string }[]) {
+    try {
+      const response = await this.ai.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: [
+          ...history.map(h => ({ role: h.role === 'user' ? 'user' : 'model', parts: [{ text: h.content }] })),
+          { role: 'user', parts: [{ text: userMessage }] }
+        ],
+        config: {
+          systemInstruction: `You are ${healerName}, a world-class ${specialty}. Provide compassionate, insightful, and healing advice to the user. Keep responses concise and calming. Use a gentle tone.`,
+          temperature: 0.8,
+        }
+      });
+      return response.text || "I am reflecting on your words. Please continue...";
+    } catch (error) {
+      console.error("Gemini Error:", error);
+      return "I'm sending you peace and light. My connection is momentary interrupted, but my presence is with you.";
+    }
+  }
+}
